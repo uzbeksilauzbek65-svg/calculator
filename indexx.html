@@ -1,142 +1,245 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uz">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pro Smart Calculator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Smart Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11/lib/browser/math.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f0f0f;
+            --accent-color: #00ffd5;
+            --btn-bg: #222;
+            --btn-hover: #333;
+            --clear-btn: #ff4b5c;
+        }
 
-<!-- REAL CALCULATOR ENGINE -->
-<script src="https://cdn.jsdelivr.net/npm/mathjs@11/lib/browser/math.js"></script>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #1a1a2e);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
 
-<style>
-body{
-margin:0;
-font-family:Arial, Helvetica, sans-serif;
-background: linear-gradient(-45deg, #ff00cc, #3333ff, #00ffd5, #ff9900);
-background-size: 400% 400%;
-animation: gradientBG 12s ease infinite;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
-color:white;
-overflow:hidden;
-}
+        @keyframes gradientBG {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
 
-/* Animated Gradient Background */
-@keyframes gradientBG {
-0% {background-position: 0% 50%;}
-50% {background-position: 100% 50%;}
-100% {background-position: 0% 50%;}
-}
+        .calculator {
+            background: rgba(17, 17, 17, 0.95);
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(0, 255, 213, 0.1);
+            width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
-/* Floating Glow Circles */
-body::before, body::after{
-content:"";
-position:absolute;
-border-radius:50%;
-filter:blur(120px);
-opacity:0.6;
-animation: float 10s infinite alternate ease-in-out;
-}
+        .title {
+            text-align: center;
+            font-size: 22px;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
 
-body::before{
-width:400px;
-height:400px;
-background:#00ffd5;
-top:-100px;
-left:-100px;
-}
+        .screen-container {
+            background: #000;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #333;
+        }
 
-body::after{
-width:500px;
-height:500px;
-background:#ff00cc;
-bottom:-150px;
-right:-150px;
-animation-delay:3s;
-}
+        .display {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #fff;
+            text-align: right;
+            outline: none;
+        }
 
-@keyframes float{
-from{transform:translateY(0px) translateX(0px);} 
-to{transform:translateY(40px) translateX(40px);} 
-}
-.calculator{
-background:#111;
-padding:30px;
-border-radius:25px;
-box-shadow:0 0 40px rgba(0,0,0,.7);
-width:520px; /* bigger calculator */
-max-width:95vw;
-}
-.title{
-text-align:center;
-font-size:28px;
-margin-bottom:15px;
-color:#00ffd5;
-font-weight:bold;
-}
-.display{
-width:100%;
-box-sizing:border-box; /* prevents overflow */
-border:none;
-border-radius:15px;
-padding:18px;
-margin-bottom:12px;
-background:#000;
-color:#00ffd5;
-font-size:30px;
-overflow-x:auto;
-}
-#result{color:#0fff95;font-size:34px;text-align:right;white-space:nowrap;overflow-x:auto;}
-.buttons{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:10px;
-}
-button{
-padding:18px;
-font-size:18px;
-border:none;
-border-radius:12px;
-cursor:pointer;
-background:#333;
-color:white;
-transition:.2s;
-}
-button:hover{background:#00ffd5;color:black;transform:scale(1.05)}
-.equal{background:#00ffd5;color:black;font-weight:bold}
-.clear{background:#ff4b5c}
-</style>
+        #expression {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        #result {
+            font-size: 32px;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        /* Ilmiy tugmalar uchun maxsus qator */
+        .scientific-row {
+            grid-column: span 4;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        button {
+            padding: 18px;
+            font-size: 18px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            background: var(--btn-bg);
+            color: white;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 0 #000;
+        }
+
+        button:hover {
+            background: var(--btn-hover);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(2px);
+            box-shadow: none;
+        }
+
+        .operator { color: var(--accent-color); }
+        
+        .equal {
+            background: var(--accent-color);
+            color: #000;
+            font-weight: bold;
+            grid-row: span 2;
+        }
+        .equal:hover { background: #00d1af; }
+
+        .clear {
+            background: var(--clear-btn);
+            color: white;
+        }
+        .clear:hover { background: #e63946; }
+
+        .sci-btn {
+            font-size: 14px;
+            background: #2a2a2a;
+            color: #aaa;
+        }
+    </style>
 </head>
 <body>
-<div class="calculator">
-<div class="title">🔥 Pro Smart Calculator</div>
-<input type="text" id="expression" class="display">
-<input type="text" id="result" class="display" placeholder="Answer" readonly>
 
-<div class="buttons">
-<button onclick="add('7')">7</button><button onclick="add('8')">8</button><button onclick="add('9')">9</button><button onclick="add('/')">÷</button><button onclick="add('(')">(</button>
-<button onclick="add('4')">4</button><button onclick="add('5')">5</button><button onclick="add('6')">6</button><button onclick="add('*')">×</button><button onclick="add(')')">)</button>
-<button onclick="add('1')">1</button><button onclick="add('2')">2</button><button onclick="add('3')">3</button><button onclick="add('-')">−</button><button onclick="add('^')">^</button>
-<button onclick="add('0')">0</button><button onclick="add('.')">.</button><button onclick="add('+')">+</button><button onclick="add('%')">%</button><button class="equal" onclick="calculate()">=</button>
-<button onclick="add('sqrt(')">√</button><button onclick="add('sin(')">sin</button><button onclick="add('cos(')">cos</button><button onclick="add('tan(')">tan</button><button class="clear" onclick="clearAll()">C</button>
-</div>
+<div class="calculator">
+    <div class="title"><span>🔥</span> Pro Smart Calculator</div>
+    
+    <div class="screen-container">
+        <input type="text" id="expression" class="display" placeholder="0" readonly>
+        <input type="text" id="result" class="display" value="0" readonly>
+    </div>
+
+    <div class="scientific-row">
+        <button class="sci-btn" onclick="add('sin(')">sin</button>
+        <button class="sci-btn" onclick="add('cos(')">cos</button>
+        <button class="sci-btn" onclick="add('tan(')">tan</button>
+        <button class="sci-btn" onclick="add('sqrt(')">√</button>
+    </div>
+
+    <div class="buttons">
+        <button class="clear" onclick="clearAll()">C</button>
+        <button onclick="backspace()">⌫</button>
+        <button class="operator" onclick="add('(')">(</button>
+        <button class="operator" onclick="add(')')">)</button>
+
+        <button onclick="add('7')">7</button>
+        <button onclick="add('8')">8</button>
+        <button onclick="add('9')">9</button>
+        <button class="operator" onclick="add('/')">÷</button>
+
+        <button onclick="add('4')">4</button>
+        <button onclick="add('5')">5</button>
+        <button onclick="add('6')">6</button>
+        <button class="operator" onclick="add('*')">×</button>
+
+        <button onclick="add('1')">1</button>
+        <button onclick="add('2')">2</button>
+        <button onclick="add('3')">3</button>
+        <button class="operator" onclick="add('-')">−</button>
+
+        <button onclick="add('0')">0</button>
+        <button onclick="add('.')">.</button>
+        <button class="operator" onclick="add('+')">+</button>
+        <button class="equal" onclick="calculate()">=</button>
+        
+        <button class="operator" style="grid-column: span 3;" onclick="add('^')">Daraja (^)</button>
+    </div>
 </div>
 
 <script>
-function add(v){expression.value+=v}
-function clearAll(){expression.value='';result.value=''}
-function calculate(){
- try{
-   let exp = expression.value.replace(/÷/g,'/').replace(/×/g,'*');
-   let ans = math.evaluate(exp); // REAL ENGINE
-   result.value = ans;
- }catch{
-   result.value='Error';
- }
-}
-expression.addEventListener('keydown',e=>{if(e.key==='Enter')calculate()});
+    const expInput = document.getElementById('expression');
+    const resInput = document.getElementById('result');
+
+    function add(v) {
+        if (expInput.value === '0') expInput.value = '';
+        expInput.value += v;
+    }
+
+    function clearAll() {
+        expInput.value = '';
+        resInput.value = '0';
+    }
+
+    function backspace() {
+        expInput.value = expInput.value.slice(0, -1);
+    }
+
+    function calculate() {
+        try {
+            let expression = expInput.value;
+            // Belgilarni MathJS tushunadigan ko'rinishga keltirish
+            let formattedExp = expression.replace(/÷/g, '/').replace(/×/g, '*');
+            
+            let ans = math.evaluate(formattedExp);
+            
+            // Natijani chiroyli formatlash (masalan, 0.3000000004 emas, 0.3 ko'rinishida)
+            resInput.value = math.format(ans, {precision: 10});
+        } catch (error) {
+            resInput.value = 'Xato!';
+        }
+    }
+
+    // Klaviaturadan foydalanish
+    document.addEventListener('keydown', (e) => {
+        if (e.key >= '0' && e.key <= '9') add(e.key);
+        if (e.key === '+') add('+');
+        if (e.key === '-') add('-');
+        if (e.key === '*') add('*');
+        if (e.key === '/') add('/');
+        if (e.key === 'Enter' || e.key === '=') calculate();
+        if (e.key === 'Backspace') backspace();
+        if (e.key === 'Escape') clearAll();
+    });
 </script>
+
 </body>
 </html>
