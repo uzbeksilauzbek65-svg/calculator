@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pro Smart Calculator</title>
+
+<!-- REAL CALCULATOR ENGINE -->
+<script src="https://cdn.jsdelivr.net/npm/mathjs@11/lib/browser/math.js"></script>
+
+<style>
+body{
+margin:0;
+font-family:Arial, Helvetica, sans-serif;
+background: linear-gradient(-45deg, #ff00cc, #3333ff, #00ffd5, #ff9900);
+background-size: 400% 400%;
+animation: gradientBG 12s ease infinite;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+color:white;
+overflow:hidden;
+}
+
+/* Animated Gradient Background */
+@keyframes gradientBG {
+0% {background-position: 0% 50%;}
+50% {background-position: 100% 50%;}
+100% {background-position: 0% 50%;}
+}
+
+/* Floating Glow Circles */
+body::before, body::after{
+content:"";
+position:absolute;
+border-radius:50%;
+filter:blur(120px);
+opacity:0.6;
+animation: float 10s infinite alternate ease-in-out;
+}
+
+body::before{
+width:400px;
+height:400px;
+background:#00ffd5;
+top:-100px;
+left:-100px;
+}
+
+body::after{
+width:500px;
+height:500px;
+background:#ff00cc;
+bottom:-150px;
+right:-150px;
+animation-delay:3s;
+}
+
+@keyframes float{
+from{transform:translateY(0px) translateX(0px);} 
+to{transform:translateY(40px) translateX(40px);} 
+}
+.calculator{
+background:#111;
+padding:30px;
+border-radius:25px;
+box-shadow:0 0 40px rgba(0,0,0,.7);
+width:520px; /* bigger calculator */
+max-width:95vw;
+}
+.title{
+text-align:center;
+font-size:28px;
+margin-bottom:15px;
+color:#00ffd5;
+font-weight:bold;
+}
+.display{
+width:100%;
+box-sizing:border-box; /* prevents overflow */
+border:none;
+border-radius:15px;
+padding:18px;
+margin-bottom:12px;
+background:#000;
+color:#00ffd5;
+font-size:30px;
+overflow-x:auto;
+}
+#result{color:#0fff95;font-size:34px;text-align:right;white-space:nowrap;overflow-x:auto;}
+.buttons{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:10px;
+}
+button{
+padding:18px;
+font-size:18px;
+border:none;
+border-radius:12px;
+cursor:pointer;
+background:#333;
+color:white;
+transition:.2s;
+}
+button:hover{background:#00ffd5;color:black;transform:scale(1.05)}
+.equal{background:#00ffd5;color:black;font-weight:bold}
+.clear{background:#ff4b5c}
+</style>
+</head>
+<body>
+<div class="calculator">
+<div class="title">🔥 Pro Smart Calculator</div>
+<input type="text" id="expression" class="display">
+<input type="text" id="result" class="display" placeholder="Answer" readonly>
+
+<div class="buttons">
+<button onclick="add('7')">7</button><button onclick="add('8')">8</button><button onclick="add('9')">9</button><button onclick="add('/')">÷</button><button onclick="add('(')">(</button>
+<button onclick="add('4')">4</button><button onclick="add('5')">5</button><button onclick="add('6')">6</button><button onclick="add('*')">×</button><button onclick="add(')')">)</button>
+<button onclick="add('1')">1</button><button onclick="add('2')">2</button><button onclick="add('3')">3</button><button onclick="add('-')">−</button><button onclick="add('^')">^</button>
+<button onclick="add('0')">0</button><button onclick="add('.')">.</button><button onclick="add('+')">+</button><button onclick="add('%')">%</button><button class="equal" onclick="calculate()">=</button>
+<button onclick="add('sqrt(')">√</button><button onclick="add('sin(')">sin</button><button onclick="add('cos(')">cos</button><button onclick="add('tan(')">tan</button><button class="clear" onclick="clearAll()">C</button>
+</div>
+</div>
+
+<script>
+function add(v){expression.value+=v}
+function clearAll(){expression.value='';result.value=''}
+function calculate(){
+ try{
+   let exp = expression.value.replace(/÷/g,'/').replace(/×/g,'*');
+   let ans = math.evaluate(exp); // REAL ENGINE
+   result.value = ans;
+ }catch{
+   result.value='Error';
+ }
+}
+expression.addEventListener('keydown',e=>{if(e.key==='Enter')calculate()});
+</script>
+</body>
+</html>
